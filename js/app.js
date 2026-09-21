@@ -42,7 +42,7 @@
   // ---- Load Movies ----
   async function loadMovies() {
     try {
-      const response = await fetch('data/movies.json');
+      const response = await fetch('/data/movies.json');
       if (!response.ok) throw new Error('Failed to load movies');
       movies = await response.json();
       filteredMovies = [...movies];
