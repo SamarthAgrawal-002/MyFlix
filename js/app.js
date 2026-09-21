@@ -254,9 +254,9 @@
     // Close player
     closePlayerBtn.addEventListener('click', closePlayer);
 
-    // Click backdrop to close
+    // Click backdrop to close (only the outer modal overlay, not the body/iframe area)
     playerModal.addEventListener('click', (e) => {
-      if (e.target === playerModal || e.target.classList.contains('player-modal__body')) {
+      if (e.target === playerModal) {
         closePlayer();
       }
     });

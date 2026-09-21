@@ -89,9 +89,10 @@
         <iframe
           id="player-iframe"
           src=""
-          allow="autoplay; encrypted-media; fullscreen"
+          allow="autoplay; encrypted-media; fullscreen; picture-in-picture; accelerometer; gyroscope"
           allowfullscreen
-          loading="lazy"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-presentation"
+          referrerpolicy="no-referrer"
           title="Movie player"
         ></iframe>
       </div>
