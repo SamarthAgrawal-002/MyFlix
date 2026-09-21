@@ -1,6 +1,6 @@
 /* ============================================================
    MovieStream — Application Logic
-   Movie catalog rendering, search, filtering, and player modal
+   Dual-mode player: Plyr.js HTML5 video + Google Drive iframe fallback
    ============================================================ */
 
 (function () {
@@ -12,7 +12,6 @@
   const movieGrid = document.getElementById('movie-grid');
   const heroSection = document.getElementById('hero');
   const playerModal = document.getElementById('player-modal');
-  const playerIframe = document.getElementById('player-iframe');
   const playerTitle = document.getElementById('player-title');
   const playerMeta = document.getElementById('player-meta');
   const playerDescription = document.getElementById('player-description');
@@ -22,10 +21,21 @@
   const noResults = document.getElementById('no-results');
   const navbar = document.querySelector('.navbar');
 
+  // Player elements
+  const videoContainer = document.getElementById('video-container');
+  const iframeContainer = document.getElementById('iframe-container');
+  const playerIframe = document.getElementById('player-iframe');
+  const plyrVideoEl = document.getElementById('plyr-player');
+  const fallbackNotice = document.getElementById('fallback-notice');
+  const openInDriveBtn = document.getElementById('open-in-drive');
+  const fallbackDriveLink = document.getElementById('fallback-drive-link');
+
   // ---- State ----
   let movies = [];
   let filteredMovies = [];
   let featuredMovie = null;
+  let plyrInstance = null;
+  let currentMovie = null;
   const STORAGE_KEY = 'moviestream_last_watched';
 
   // ---- Initialize ----
@@ -36,7 +46,6 @@
     renderHero();
     renderMovies(movies);
     setupEventListeners();
-    markContinueWatching();
   }
 
   // ---- Load Movies ----
@@ -160,6 +169,19 @@
     renderMovies(filteredMovies);
   }
 
+  // ---- Build URLs ----
+  function getDriveDirectUrl(fileId) {
+    return `https://drive.google.com/uc?export=download&id=${fileId}`;
+  }
+
+  function getDriveEmbedUrl(fileId) {
+    return `https://drive.google.com/file/d/${fileId}/preview`;
+  }
+
+  function getDriveViewUrl(fileId) {
+    return `https://drive.google.com/file/d/${fileId}/view`;
+  }
+
   // ---- Player Modal ----
   function openPlayer(movie) {
     if (!movie || movie.driveFileId === 'REPLACE_WITH_YOUR_DRIVE_FILE_ID') {
@@ -167,8 +189,14 @@
       return;
     }
 
-    const embedUrl = `https://drive.google.com/file/d/${movie.driveFileId}/preview`;
-    playerIframe.src = embedUrl;
+    currentMovie = movie;
+
+    // Set "Open in Drive" links
+    const driveViewUrl = getDriveViewUrl(movie.driveFileId);
+    openInDriveBtn.href = driveViewUrl;
+    fallbackDriveLink.href = driveViewUrl;
+
+    // Set player info
     playerTitle.textContent = movie.title;
     playerMeta.innerHTML = `
       <span class="rating">★ ${movie.rating}</span>
@@ -177,16 +205,123 @@
       <span>${movie.genre.join(', ')}</span>`;
     playerDescription.textContent = movie.description;
 
+    // Show modal
     playerModal.classList.add('active');
     document.body.style.overflow = 'hidden';
+
+    // Try Plyr first, then fallback
+    startPlyrPlayer(movie.driveFileId);
 
     saveLastWatched(movie.id);
   }
 
+  // ---- Tier 1: Plyr HTML5 Player ----
+  function startPlyrPlayer(fileId) {
+    // Reset state
+    videoContainer.style.display = 'block';
+    iframeContainer.style.display = 'none';
+    fallbackNotice.style.display = 'none';
+
+    const directUrl = getDriveDirectUrl(fileId);
+
+    // Set source
+    plyrVideoEl.innerHTML = `<source src="${directUrl}" type="video/mp4" />`;
+
+    // Destroy existing Plyr instance
+    if (plyrInstance) {
+      plyrInstance.destroy();
+      plyrInstance = null;
+    }
+
+    // Initialize Plyr
+    plyrInstance = new Plyr(plyrVideoEl, {
+      controls: [
+        'play-large', 'rewind', 'play', 'fast-forward', 'progress',
+        'current-time', 'duration', 'mute', 'volume',
+        'captions', 'settings', 'pip', 'airplay', 'fullscreen'
+      ],
+      settings: ['captions', 'quality', 'speed'],
+      speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
+      keyboard: { focused: true, global: false },
+      tooltips: { controls: true, seek: true },
+      captions: { active: false, update: true },
+      fullscreen: { enabled: true, fallback: true, iosNative: true },
+      clickToPlay: true,
+      hideControls: true,
+      resetOnEnd: false,
+      invertTime: false,
+    });
+
+    // Listen for errors — fallback to iframe
+    let errorHandled = false;
+
+    plyrVideoEl.addEventListener('error', function onError() {
+      if (!errorHandled) {
+        errorHandled = true;
+        console.warn('Plyr: Direct URL failed, falling back to Google Drive iframe');
+        switchToIframeFallback(fileId);
+      }
+    }, { once: true });
+
+    // Also check if the source fails to load within 8 seconds
+    const loadTimeout = setTimeout(() => {
+      if (plyrVideoEl.readyState === 0 && !errorHandled) {
+        errorHandled = true;
+        console.warn('Plyr: Load timeout, falling back to Google Drive iframe');
+        switchToIframeFallback(fileId);
+      }
+    }, 8000);
+
+    plyrVideoEl.addEventListener('loadeddata', () => {
+      clearTimeout(loadTimeout);
+    }, { once: true });
+
+    // Try to play
+    plyrVideoEl.load();
+  }
+
+  // ---- Tier 2: Google Drive Iframe Fallback ----
+  function switchToIframeFallback(fileId) {
+    // Destroy Plyr
+    if (plyrInstance) {
+      plyrInstance.destroy();
+      plyrInstance = null;
+    }
+
+    // Hide video, show iframe
+    videoContainer.style.display = 'none';
+    iframeContainer.style.display = 'block';
+    fallbackNotice.style.display = 'flex';
+
+    // Load iframe
+    const embedUrl = getDriveEmbedUrl(fileId);
+    playerIframe.src = embedUrl;
+  }
+
+  // ---- Close Player ----
   function closePlayer() {
     playerModal.classList.remove('active');
-    playerIframe.src = '';
     document.body.style.overflow = '';
+    currentMovie = null;
+
+    // Cleanup Plyr
+    if (plyrInstance) {
+      plyrInstance.pause();
+      plyrInstance.destroy();
+      plyrInstance = null;
+    }
+
+    // Cleanup iframe
+    playerIframe.src = '';
+
+    // Reset video element
+    plyrVideoEl.innerHTML = '';
+    plyrVideoEl.load();
+
+    // Reset visibility
+    videoContainer.style.display = 'block';
+    iframeContainer.style.display = 'none';
+    fallbackNotice.style.display = 'none';
   }
 
   // ---- LocalStorage: Continue Watching ----
@@ -202,10 +337,6 @@
     } catch (e) {
       return null;
     }
-  }
-
-  function markContinueWatching() {
-    // Re-render to add "Continue" badge — already handled in renderMovies
   }
 
   // ---- Event Listeners ----
@@ -254,7 +385,7 @@
     // Close player
     closePlayerBtn.addEventListener('click', closePlayer);
 
-    // Click backdrop to close (only the outer modal overlay, not the body/iframe area)
+    // Click backdrop to close
     playerModal.addEventListener('click', (e) => {
       if (e.target === playerModal) {
         closePlayer();
