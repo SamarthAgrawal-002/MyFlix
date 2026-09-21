@@ -1,0 +1,86 @@
+[
+  {
+    "id": 7,
+    "title": "Hanuman Ansh",
+    "description": "A biographical spiritual drama based on the life of Neem Karoli Baba (Maharaj-ji), the revered spiritual leader. Directed by Vishal Chaturvedi and inspired by his book 'Divine Detour: That Changed My Life'.",
+    "genre": ["Drama", "Biography", "Spiritual"],
+    "year": 2026,
+    "rating": "8.7",
+    "driveFileId": "1C5ZBI_cedpUYHCu2YzuUPL9CmH947Fpa",
+    "thumbnail": "https://upload.wikimedia.org/wikipedia/en/3/35/Hanuman_Ansh_poster.jpg",
+    "duration": "2h 30m",
+    "featured": true
+  },
+  {
+    "id": 1,
+    "title": "Interstellar",
+    "description": "When Earth becomes uninhabitable in the future, a farmer and ex-NASA pilot is tasked with piloting a spacecraft to find a new home for humanity.",
+    "genre": ["Sci-Fi", "Drama", "Adventure"],
+    "year": 2014,
+    "rating": "8.7",
+    "driveFileId": "REPLACE_WITH_YOUR_DRIVE_FILE_ID",
+    "thumbnail": "https://m.media-amazon.com/images/M/MV5BYzdjMDAxZGItMjI2My00ODA1LTlkNzItOWFjMDU5ZDJlYWY3XkEyXkFqcGc@._V1_.jpg",
+    "duration": "2h 49m",
+    "featured": false
+  },
+  {
+    "id": 2,
+    "title": "The Dark Knight",
+    "description": "Batman raises the stakes in his war on crime, facing the Joker, a criminal mastermind who plunges Gotham into anarchy.",
+    "genre": ["Action", "Crime", "Drama"],
+    "year": 2008,
+    "rating": "9.0",
+    "driveFileId": "REPLACE_WITH_YOUR_DRIVE_FILE_ID",
+    "thumbnail": "https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_.jpg",
+    "duration": "2h 32m",
+    "featured": false
+  },
+  {
+    "id": 3,
+    "title": "Inception",
+    "description": "A thief who steals corporate secrets through dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
+    "genre": ["Action", "Sci-Fi", "Thriller"],
+    "year": 2010,
+    "rating": "8.8",
+    "driveFileId": "REPLACE_WITH_YOUR_DRIVE_FILE_ID",
+    "thumbnail": "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_.jpg",
+    "duration": "2h 28m",
+    "featured": false
+  },
+  {
+    "id": 4,
+    "title": "Parasite",
+    "description": "Greed and class discrimination threaten the newly formed symbiotic relationship between the wealthy Park family and the destitute Kim clan.",
+    "genre": ["Drama", "Thriller"],
+    "year": 2019,
+    "rating": "8.5",
+    "driveFileId": "REPLACE_WITH_YOUR_DRIVE_FILE_ID",
+    "thumbnail": "https://m.media-amazon.com/images/M/MV5BYjk1Y2U4MjQtY2ZiNS00OWQyLWI3MmYtZWUwNmRjYWRiNWNhXkEyXkFqcGc@._V1_.jpg",
+    "duration": "2h 12m",
+    "featured": false
+  },
+  {
+    "id": 5,
+    "title": "The Matrix",
+    "description": "A computer programmer discovers that reality as he knows it is a simulation created by machines, and joins a rebellion to overthrow them.",
+    "genre": ["Action", "Sci-Fi"],
+    "year": 1999,
+    "rating": "8.7",
+    "driveFileId": "REPLACE_WITH_YOUR_DRIVE_FILE_ID",
+    "thumbnail": "https://m.media-amazon.com/images/M/MV5BN2NmN2VhMTQtMDNiOS00NDlhLTliMjgtODE2ZDYxZjlhYmRiXkEyXkFqcGc@._V1_.jpg",
+    "duration": "2h 16m",
+    "featured": false
+  },
+  {
+    "id": 6,
+    "title": "Whiplash",
+    "description": "A promising young drummer enrolls at a cut-throat music conservatory where his dreams of greatness are mentored by an instructor who will stop at nothing.",
+    "genre": ["Drama", "Music"],
+    "year": 2014,
+    "rating": "8.5",
+    "driveFileId": "REPLACE_WITH_YOUR_DRIVE_FILE_ID",
+    "thumbnail": "https://m.media-amazon.com/images/M/MV5BOTA5NDZlZGUtMjAxOS00YTRhLThmZDUtMjE3MjI3NjcwMTMxXkEyXkFqcGc@._V1_.jpg",
+    "duration": "1h 47m",
+    "featured": false
+  }
+]

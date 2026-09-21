@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 40" fill="none">
+  <polygon points="5,4 5,36 30,20" fill="#e50914"/>
+  <text x="38" y="30" font-family="'Segoe UI', Arial, sans-serif" font-weight="700" font-size="26" fill="#ffffff">Movie</text>
+  <text x="120" y="30" font-family="'Segoe UI', Arial, sans-serif" font-weight="700" font-size="26" fill="#e50914">Stream</text>
+</svg>

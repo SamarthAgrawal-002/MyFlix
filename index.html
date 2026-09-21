@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="MovieStream — Stream your personal movie collection from Google Drive" />
+  <meta name="theme-color" content="#0d0d0d" />
+  <title>MovieStream</title>
+
+  <!-- Favicon (play icon) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon fill='%23e50914' points='20,10 20,90 85,50'/></svg>" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <!-- ===== Navbar ===== -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <img src="assets/logo.svg" alt="MovieStream" class="navbar__logo" />
+
+    <div class="navbar__search">
+      <span class="navbar__search-icon">🔍</span>
+      <input
+        type="search"
+        id="search-input"
+        class="navbar__search-input"
+        placeholder="Search movies..."
+        aria-label="Search movies"
+        autocomplete="off"
+      />
+    </div>
+
+    <select id="genre-filter" class="navbar__filter" aria-label="Filter by genre">
+      <option value="">All Genres</option>
+      <!-- Populated dynamically by JS -->
+    </select>
+  </nav>
+
+  <!-- ===== Hero Section ===== -->
+  <section class="hero" id="hero" aria-label="Featured movie">
+    <div class="hero__content">
+      <span class="hero__badge">Featured</span>
+      <h1 class="hero__title" id="hero-title">Loading...</h1>
+      <div class="hero__meta">
+        <span class="hero__rating" id="hero-rating"></span>
+        <span id="hero-year"></span>
+        <span id="hero-duration"></span>
+        <span id="hero-genres"></span>
+      </div>
+      <p class="hero__description" id="hero-description"></p>
+      <div class="hero__actions">
+        <button class="btn btn--primary" id="hero-play-btn" aria-label="Play featured movie">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+          Play
+        </button>
+        <button class="btn btn--secondary" id="hero-info-btn" aria-label="More info">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          Browse All
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Movie Catalog ===== -->
+  <main>
+    <section class="section" id="movies-section">
+      <h2 class="section__title">🎬 All Movies</h2>
+      <div class="movie-grid" id="movie-grid" role="list">
+        <!-- Populated dynamically by JS -->
+      </div>
+      <div class="no-results" id="no-results" style="display: none;">
+        <div class="no-results__icon">🔍</div>
+        <p class="no-results__text">No movies found. Try a different search or filter.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== Player Modal ===== -->
+  <div class="player-modal" id="player-modal" role="dialog" aria-modal="true" aria-label="Movie player">
+    <div class="player-modal__header">
+      <div class="player-modal__title" id="player-title"></div>
+      <button class="player-modal__close" id="close-player" aria-label="Close player">✕</button>
+    </div>
+    <div class="player-modal__body">
+      <div class="player-modal__iframe-wrapper">
+        <iframe
+          id="player-iframe"
+          src=""
+          allow="autoplay; encrypted-media; fullscreen"
+          allowfullscreen
+          loading="lazy"
+          title="Movie player"
+        ></iframe>
+      </div>
+    </div>
+    <div class="player-modal__info">
+      <div class="player-modal__meta" id="player-meta"></div>
+      <p class="player-modal__description" id="player-description"></p>
+    </div>
+  </div>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer">
+    <p>MovieStream &mdash; Your personal movie library. Stream from Google Drive.</p>
+    <p style="margin-top: 8px;">
+      To add movies, edit <code>data/movies.json</code> with your Google Drive file IDs.
+    </p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/app.js"></script>
+</body>
+</html>
