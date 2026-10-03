@@ -22,20 +22,16 @@
   const navbar = document.querySelector('.navbar');
 
   // Player elements
-  const videoContainer = document.getElementById('video-container');
-  const iframeContainer = document.getElementById('iframe-container');
-  const playerIframe = document.getElementById('player-iframe');
   const plyrVideoEl = document.getElementById('plyr-player');
-  const fallbackNotice = document.getElementById('fallback-notice');
   const openInDriveBtn = document.getElementById('open-in-drive');
-  const fallbackDriveLink = document.getElementById('fallback-drive-link');
 
   // ---- State ----
   let movies = [];
   let filteredMovies = [];
   let featuredMovie = null;
-  let plyrInstance = null;
   let currentMovie = null;
+  let plyrInstance = null;
+  const GOOGLE_DRIVE_API_KEY = 'AIzaSyASVxGIF15mV4c_qz02cmNYc_d9MYH8tHI';
   const STORAGE_KEY = 'moviestream_last_watched';
 
   // ---- Initialize ----
@@ -170,12 +166,8 @@
   }
 
   // ---- Build URLs ----
-  function getDriveDirectUrl(fileId) {
-    return `https://drive.google.com/uc?export=download&id=${fileId}`;
-  }
-
-  function getDriveEmbedUrl(fileId) {
-    return `https://drive.google.com/file/d/${fileId}/preview`;
+  function getDriveApiStreamUrl(fileId) {
+    return `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${GOOGLE_DRIVE_API_KEY}`;
   }
 
   function getDriveViewUrl(fileId) {
@@ -194,7 +186,6 @@
     // Set "Open in Drive" links
     const driveViewUrl = getDriveViewUrl(movie.driveFileId);
     openInDriveBtn.href = driveViewUrl;
-    fallbackDriveLink.href = driveViewUrl;
 
     // Set player info
     playerTitle.textContent = movie.title;
@@ -209,93 +200,36 @@
     playerModal.classList.add('active');
     document.body.style.overflow = 'hidden';
 
-    // Try Plyr first, then fallback
-    startPlyrPlayer(movie.driveFileId);
+    // Set up Plyr with API Stream URL
+    const streamUrl = getDriveApiStreamUrl(movie.driveFileId);
+    plyrVideoEl.innerHTML = `<source src="${streamUrl}" type="video/mp4" />`;
 
-    saveLastWatched(movie.id);
-  }
-
-  // ---- Tier 1: Plyr HTML5 Player ----
-  function startPlyrPlayer(fileId) {
-    // Reset state
-    videoContainer.style.display = 'block';
-    iframeContainer.style.display = 'none';
-    fallbackNotice.style.display = 'none';
-
-    const directUrl = getDriveDirectUrl(fileId);
-
-    // Set source
-    plyrVideoEl.innerHTML = `<source src="${directUrl}" type="video/mp4" />`;
-
-    // Destroy existing Plyr instance
     if (plyrInstance) {
       plyrInstance.destroy();
-      plyrInstance = null;
     }
 
-    // Initialize Plyr
     plyrInstance = new Plyr(plyrVideoEl, {
       controls: [
         'play-large', 'rewind', 'play', 'fast-forward', 'progress',
         'current-time', 'duration', 'mute', 'volume',
-        'captions', 'settings', 'pip', 'airplay', 'fullscreen'
+        'settings', 'pip', 'airplay', 'fullscreen'
       ],
-      settings: ['captions', 'quality', 'speed'],
+      settings: ['quality', 'speed'],
       speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
       keyboard: { focused: true, global: false },
-      tooltips: { controls: true, seek: true },
-      captions: { active: false, update: true },
       fullscreen: { enabled: true, fallback: true, iosNative: true },
-      clickToPlay: true,
-      hideControls: true,
-      resetOnEnd: false,
-      invertTime: false,
+      autoplay: true
     });
 
-    // Listen for errors — fallback to iframe
-    let errorHandled = false;
-
-    plyrVideoEl.addEventListener('error', function onError() {
-      if (!errorHandled) {
-        errorHandled = true;
-        console.warn('Plyr: Direct URL failed, falling back to Google Drive iframe');
-        switchToIframeFallback(fileId);
-      }
+    // Handle errors (e.g., API limits, wrong permissions)
+    plyrVideoEl.addEventListener('error', () => {
+      console.error("Video failed to load.");
+      // The Open in Drive button serves as the fallback
     }, { once: true });
 
-    // Also check if the source fails to load within 8 seconds
-    const loadTimeout = setTimeout(() => {
-      if (plyrVideoEl.readyState === 0 && !errorHandled) {
-        errorHandled = true;
-        console.warn('Plyr: Load timeout, falling back to Google Drive iframe');
-        switchToIframeFallback(fileId);
-      }
-    }, 8000);
-
-    plyrVideoEl.addEventListener('loadeddata', () => {
-      clearTimeout(loadTimeout);
-    }, { once: true });
-
-    // Try to play
     plyrVideoEl.load();
-  }
 
-  // ---- Tier 2: Google Drive Iframe Fallback ----
-  function switchToIframeFallback(fileId) {
-    // Destroy Plyr
-    if (plyrInstance) {
-      plyrInstance.destroy();
-      plyrInstance = null;
-    }
-
-    // Hide video, show iframe
-    videoContainer.style.display = 'none';
-    iframeContainer.style.display = 'block';
-    fallbackNotice.style.display = 'flex';
-
-    // Load iframe
-    const embedUrl = getDriveEmbedUrl(fileId);
-    playerIframe.src = embedUrl;
+    saveLastWatched(movie.id);
   }
 
   // ---- Close Player ----
@@ -304,25 +238,16 @@
     document.body.style.overflow = '';
     currentMovie = null;
 
-    // Cleanup Plyr
     if (plyrInstance) {
       plyrInstance.pause();
       plyrInstance.destroy();
       plyrInstance = null;
     }
-
-    // Cleanup iframe
-    playerIframe.src = '';
-
-    // Reset video element
+    
     plyrVideoEl.innerHTML = '';
     plyrVideoEl.load();
-
-    // Reset visibility
-    videoContainer.style.display = 'block';
-    iframeContainer.style.display = 'none';
-    fallbackNotice.style.display = 'none';
   }
+
 
   // ---- LocalStorage: Continue Watching ----
   function saveLastWatched(movieId) {

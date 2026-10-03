@@ -10,6 +10,7 @@
   <!-- Favicon (play icon) -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon fill='%23e50914' points='20,10 20,90 85,50'/></svg>" />
 
+
   <!-- Plyr.js CSS -->
   <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 
@@ -95,32 +96,10 @@
     </div>
 
     <div class="player-modal__body">
-      <div class="player-modal__player-wrapper">
-        <!-- Tier 1: HTML5 Video with Plyr -->
-        <div class="player-modal__video-container" id="video-container">
-          <video id="plyr-player" playsinline crossorigin>
-            <!-- Source set dynamically by JS -->
-          </video>
-        </div>
-
-        <!-- Tier 2: Google Drive Iframe Fallback (hidden by default) -->
-        <div class="player-modal__iframe-container" id="iframe-container" style="display: none;">
-          <iframe
-            id="player-iframe"
-            src=""
-            allow="autoplay; encrypted-media; fullscreen; picture-in-picture; accelerometer; gyroscope"
-            allowfullscreen
-            title="Movie player"
-          ></iframe>
-        </div>
-
-        <!-- Fallback notice -->
-        <div class="player-modal__fallback-notice" id="fallback-notice" style="display: none;">
-          <p>📡 Switched to Google Drive player. If playback still fails:</p>
-          <a class="btn btn--primary btn--sm" id="fallback-drive-link" href="#" target="_blank" rel="noopener noreferrer">
-            ▶ Open directly in Google Drive
-          </a>
-        </div>
+      <div class="player-modal__video-container">
+        <video id="plyr-player" playsinline>
+          <!-- Source set dynamically by JS API -->
+        </video>
       </div>
     </div>
 
