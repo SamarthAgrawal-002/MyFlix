@@ -200,9 +200,9 @@
     playerModal.classList.add('active');
     document.body.style.overflow = 'hidden';
 
-    // Set up Plyr with API Stream URL
+    // Set source directly on the video element (more reliable on mobile than <source> tags)
     const streamUrl = getDriveApiStreamUrl(movie.driveFileId);
-    plyrVideoEl.innerHTML = `<source src="${streamUrl}" type="video/mp4" />`;
+    plyrVideoEl.src = streamUrl;
 
     if (plyrInstance) {
       plyrInstance.destroy();
@@ -212,13 +212,13 @@
       controls: [
         'play-large', 'rewind', 'play', 'fast-forward', 'progress',
         'current-time', 'duration', 'mute', 'volume',
-        'settings', 'pip', 'airplay', 'fullscreen'
+        'settings', 'fullscreen'
       ],
       settings: ['quality', 'speed'],
       speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
       keyboard: { focused: true, global: false },
       fullscreen: { enabled: true, fallback: true, iosNative: true },
-      autoplay: true
+      clickToPlay: true
     });
 
     // Handle errors (e.g., API limits, wrong permissions)
@@ -227,7 +227,10 @@
       // The Open in Drive button serves as the fallback
     }, { once: true });
 
-    plyrVideoEl.load();
+    // Try to play once ready (catch mobile autoplay blocks)
+    plyrInstance.on('ready', () => {
+      plyrInstance.play().catch(e => console.log("Play required user interaction:", e));
+    });
 
     saveLastWatched(movie.id);
   }
